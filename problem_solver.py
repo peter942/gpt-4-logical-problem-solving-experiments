@@ -12,8 +12,10 @@ st.title("GPT-4 Problem Solver")
 
 st.write("Here, I'm testing various approaches to problem solving using GPT-4 - the goal is to try to figure out approaches that overcome the limitations and weaknesses of GPT-4 by augmenting it with different reasoning techniques. You can find the code for this app [here](https://github.com/peter942/gpt-4-logical-problem-solving-experiments).")
 
-if openai.api_key == "":
-    openai.api_key = st.text_input("OpenAI API Key", type="password")
+with st.expander("OpenAI API Key"):
+    openai_api_key = st.text_input("OpenAI API Key", type="password")
+    if st.button("Set OpenAI API Key"):
+        openai.api_key = openai_api_key
     st.info("You'll need GPT-4 API access to run this :(")
 
 which_approach = st.radio("Which approach:", ("Multiple Perspectives", "Self-Challenging"), horizontal=True)
