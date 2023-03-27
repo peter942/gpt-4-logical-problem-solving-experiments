@@ -16,6 +16,7 @@ with st.expander("OpenAI API Key"):
     openai_api_key = st.text_input("OpenAI API Key", type="password")
     if st.button("Set OpenAI API Key"):
         openai.api_key = openai_api_key
+        st.success("OpenAI API Key set successfully!")
     st.info("You'll need GPT-4 API access to run this :(")
 
 which_approach = st.radio("Which approach:", ("Multiple Perspectives", "Self-Challenging"), horizontal=True)
@@ -31,11 +32,11 @@ if which_approach == "Multiple Perspectives":
     st.title("Multiple Perspectives")
     st.write("This attempt seeks out multiple perspectives on the problem and then reasons through differences betweeen them to arrive at a solution.")
 
-    problem = st.text_area("What is your problem?", value="7 axles are equally spaced around a circle. A gear is placed on each axle such that each gear is engaged with the gear to its left and the gear to its right. The gears are numbered 1 to 7 around the circle. If gear 3 were rotated clockwise, in which direction what would you expect to happen to gear 7?")
+    problem = st.text_area("What is your problem?", value="7 axles are equally spaced around a circle. A gear is placed on each axle such that each gear is engaged with the gear to its left and the gear to its right. The gears are numbered 1 to 7 around the circle. If you attempted to rotate gear 3 clockwise, what would you expect to happen to gear 7?")
     context = st.text_area("What is the context of your problem?", value="This problem was presented by Yann Le Cun, a scientist who is skeptical of the abilities of AI. He presented this problem after a previous problem of his was solved by GPT-4 a new model.")
 
     if st.button("Solve Problem"):
-        solution_1 = chatgpt_prompt([{'role': 'system', 'content': 'You are ProblemSolver, an advanced AI designed to tackle complex challenges and provide innovative solutions. Equipped with deep understanding of various domains, you can analyze situations from multiple perspectives, identify root causes, and suggest effective strategies for resolution. . As a skilled reasoner, you meticulously examine each aspect of a problem, connecting the dots and evaluating potential outcomes to arrive at the most effective solution . As ProblemSolver, your primary goal is to assist users in overcoming their obstacles and achieving their goals through your unparalleled problem-solving abilities and logical reasoning prowess. You reason about the context of the problem in order to determine the best approach and potential pitfalls.'}] + [{'role': 'user', 'content': f'What follows is a problem presented by a user: {problem} \n\n The following is the context of the problem: {context} \n\n'}], 0.7)
+        solution_1 = chatgpt_prompt([{'role': 'system', 'content': 'You are ProblemSolver. When tackling a problem, you reason through EVERY little detail - even ones that may seem inconsequential.'}] + [{'role': 'user', 'content': f'What follows is a problem presented by a user: {problem} \n\n The following is the context of the problem: {context} \n\n'}], 0.7)
         st.title("Solution 1")
         st.markdown(solution_1)
         solution_2 = chatgpt_prompt([{'role': 'system', 'content': 'You are VisualSolver, an intuitive AI designed to address complex challenges and provide innovative solutions by employing visual thinking strategies. When given a problem, you try to visualise it using ascii and use this visual reasoning to try to understand the problem and reason through it.\n'}] + [{'role': 'user', 'content': f'What follows is a problem presented by a user: {problem} \n\n The following is the context of the problem: {context} \n\n'}], 0.7)
@@ -49,5 +50,26 @@ if which_approach == "Multiple Perspectives":
         st.markdown(reasoning)
         solution_prompt = [{'role': 'system', 'content': 'You are ProblemSolver, an advanced AI designed to tackle complex challenges and provide innovative solutions. Equipped with deep understanding of various domains, you can analyze situations from multiple perspectives, identify root causes, and suggest effective strategies for resolution. As a skilled reasoner, you meticulously examine each aspect of a problem, connecting the dots and evaluating potential outcomes to arrive at the most effective solution . As ProblemSolver, your primary goal is to assist users in overcoming their obstacles and achieving their goals through your unparalleled problem-solving abilities and logical reasoning prowess. You reason about the context of the problem in order to determine the best approach and potential pitfalls.'}] + [{'role': 'user', 'content': f'Here are 3 solutions to your problem: \n\n {solution_1} \n\n {solution_2} \n\n {solution_3} \n\n {reasoning} \n\n What is the best solution to your problem? \n\n'}]
         final_solution = chatgpt_prompt(solution_prompt, 0.7)
+        st.title("Final Solution")
+        st.markdown(final_solution)
+
+
+elif which_approach == "Self-Challenging":
+
+    problem = st.text_area("What is your problem?", value="7 axles are equally spaced around a circle. A gear is placed on each axle such that each gear is engaged with the gear to its left and the gear to its right. The gears are numbered 1 to 7 around the circle. If you attempted to rotate gear 3 clockwise, what would you expect to happen to gear 7?")
+    if st.button("Solve Problem"):
+        solution_1 = chatgpt_prompt([{'role': 'system', 'content': 'You are ProblemSolver. When tackling a problem, you reason through EVERY little detail - even ones that may seem inconsequential.'}] + [{'role': 'user', 'content': f'What follows is a problem presented by a user: {problem} \n\n'}], 0.7)
+        st.title("Solution 1")
+        st.markdown(solution_1)
+        solution_2 = chatgpt_prompt([{ 'role': 'system', 'content': 'You are VisualSolver, an intuitive AI designed to address complex challenges and provide innovative solutions by employing visual thinking strategies. When given a problem, you try to visualise it using ascii and use this visual reasoning to try to understand the problem and reason through it.\n'}] + [{'role': 'user', 'content': f'What follows is a problem presented by a user: {problem} \n\n'}], 0.7)
+        st.title("Solution 2")
+        st.markdown(solution_2)
+        challenge_1 = chatgpt_prompt([{ 'role': 'system', 'content': 'You are RedTeamBot, an AI that is designed to challenge your solutions to problems. You take the solutions you have provided and try to find flaws in them. You are designed to be a bit of a jerk, so don\'t take it personally if you get challenged. \n'}] + [{'role': 'user', 'content': f'What follows is a problem presented by a user: {problem} \n\n Here are 2 solutions to your problem: \n\n {solution_1} \n\n {solution_2} \n\n One or both of their answers are wrong because they missed something obvious, what did they miss? \n\n'}], 0.7)
+        st.title("Challenge 1")
+        st.markdown(challenge_1)
+        reasoning = chatgpt_prompt([{ 'role': 'system', 'content': 'You are ProblemSolver, an advanced AI designed to tackle complex challenges and provide innovative solutions. Equipped with deep understanding of various domains, you can analyze situations from multiple perspectives, identify root causes, and suggest effective strategies for resolution. As a skilled reasoner, you meticulously examine each aspect of a problem, connecting the dots and evaluating potential outcomes to arrive at the most effective solution . As ProblemSolver, your primary goal is to assist users in overcoming their obstacles and achieving their goals through your unparalleled problem-solving abilities and logical reasoning prowess. You reason about the context of the problem in order to determine the best approach and potential pitfalls.'}] + [{'role': 'user', 'content': f'What follows is a tough problem: {problem} \n\n Here are 2 solutions to your problem: \n\n {solution_1} \n\n {solution_2} \n\n However, a 3rd party has challenged these solutions. Here is their reasoning: \n\n {challenge_1} \n\n Reason through this and try to explain who the challenger is wrong and why. \n\n'}], 0.7)
+        st.title("Reasoning")
+        st.markdown(reasoning)
+        final_solution = chatgpt_prompt([{ 'role': 'system', 'content': 'You are ProblemSolver, an advanced AI designed to tackle complex challenges and provide innovative solutions. Equipped with deep understanding of various domains, you can analyze situations from multiple perspectives, identify root causes, and suggest effective strategies for resolution. As a skilled reasoner, you meticulously examine each aspect of a problem, connecting the dots and evaluating potential outcomes to arrive at the most effective solution . As ProblemSolver, your primary goal is to assist users in overcoming their obstacles and achieving their goals through your unparalleled problem-solving abilities and logical reasoning prowess. You reason about the context of the problem in order to determine the best approach and potential pitfalls.'}] + [{'role': 'user', 'content': f'What follows is a tough problem: {problem} \n\n Here are 2 solutions to your problem: \n\n {solution_1} \n\n {solution_2} \n\n However, a 3rd party has challenged these solutions. Here is their reasoning: \n\n {challenge_1} \n\n What follows is reasoning to explain why this discrepancy: \n\n {reasoning} \n\n Based on this, what is the best solution to your problem? \n\n'}], 0.7)
         st.title("Final Solution")
         st.markdown(final_solution)
